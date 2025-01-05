@@ -69,6 +69,36 @@ The serevr is ready when you see `Uvicorn running on http://0.0.0.0:8000`.
 
 > NOTE: Using llama models require you to accept the license. Please, visit [model page](https://huggingface.co/meta-llama/Llama-3.2-1B-Instruct) and get the access. Then, use your [access token](https://huggingface.co/settings/tokens) above.
 
+### Test
+
+There are unit tests provided for the server part. To run them and validate the server do:
+
+```bash
+cd tests/unit
+PYTHONPATH=../.. python -m unittest test_server.py
+```
+
+### Benchmark
+
+You can also benchmark the server and measure average response time for many concurrent users and different request lengths by using the provided tool. First install dependencies.
+
+```bash
+cd tests/benchmark
+pip install -r ../requirements.txt
+```
+
+Then, use the tool and provided arguments.
+
+```bash
+python tool.py --url <server_url> --iterations <iterations> --num_users <users> --request_length <request>
+```
+
+where:
+- `<server_url>` means the URL with port number when server is running
+- `<iterations` means how many times the test will be performed (to average results)
+- `<users>` means how many concurrent users should send the request
+- `<request>` means the length of the request (user's questions) in characters (bytes)
+
 ## Client
 
 The utilize the chatbot running on the server, you can use any HTTP client e.g. Postman. Nevertheless, the project provides a simple client also.
