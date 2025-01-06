@@ -1,5 +1,6 @@
 import asyncio
 import logging as log
+import random
 import time
 from collections import defaultdict
 
@@ -27,8 +28,12 @@ class BenchmarkTool:
                 return float("inf"), False
 
     async def simulate_user(self, length: int):
-        question = "A" * length
+        # "user is waiting" 0 to 10s before sending the request
+        wait_time = random.random() * 10
+        await asyncio.sleep(wait_time)
+        question = "what " * length
         response_time, success = await self.send_request(question)
+        log.info(f"Response time: {response_time:.2f}")
         return response_time, success
 
     async def run_benchmark(self):
@@ -52,7 +57,7 @@ class BenchmarkTool:
             results["response_time"].append(avg_response_time)
             results["success_rate"].append(success_rate)
 
-            log.debug(f"Avg Response Time={avg_response_time:.2f}s, Success Rate={success_rate:.2f}%, Total Time={total_time:.2f}s")
+            log.info(f"Avg Response Time={avg_response_time:.2f}s, Success Rate={success_rate:.2f}%, Total Time={total_time:.2f}s")
 
         self.show_summary(results)
 
@@ -72,9 +77,9 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Benchmark FastAPI Server Performance")
     parser.add_argument("--url", type=str, default="http://localhost:8000/answer", help="Server URL")
-    parser.add_argument("--iterations", type=int, default=25, help="Number of test iterations")
+    parser.add_argument("--iterations", type=int, default=10, help="Number of test iterations to average")
     parser.add_argument("--num_users", type=int, default=1, help="Number of concurrent users")
-    parser.add_argument("--request_length", type=int, default=50, help="Request length")
+    parser.add_argument("--request_length", type=int, default=5, help="Request length in tokens")
     args = parser.parse_args()
 
     benchmark = BenchmarkTool(url=args.url, num_users=args.num_users, request_length=args.request_length, iterations=args.iterations)
